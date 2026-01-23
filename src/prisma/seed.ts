@@ -5,9 +5,6 @@ import { logger } from "../logger";
 async function main() {
   logger.info("🌱 Seeding database...");
 
-  // =======================
-  // RESET DATABASE
-  // =======================
   const delPrivat = await prisma.privatWordSet.deleteMany();
   logger.info(`Deleted ${delPrivat.count} PrivatWordSets`);
 
@@ -17,9 +14,6 @@ async function main() {
   const delWordSets = await prisma.wordSet.deleteMany();
   logger.info(`Deleted ${delWordSets.count} WordSets`);
 
-  // =======================
-  // WORD SETS
-  // =======================
   const wordSets = [
     {
       title: "Schule",
@@ -129,7 +123,7 @@ async function main() {
   logger.info(`✅ Inserted ${wordSets.length} WordSets`);
 
   // =======================
-  // PRIVAT WORD SETS (FIXE CODES)
+  // PRIVAT WORD SETS
   // =======================
   const privatSets = [
     {

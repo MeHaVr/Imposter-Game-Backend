@@ -1,4 +1,3 @@
-// src/bot/telegram.ts
 import { Bot } from "gramio";
 import { logger } from "../logger";
 import { prisma } from "../prisma";
@@ -11,13 +10,7 @@ if (!BOT_TOKEN) throw new Error("TG_BOT_TOKEN fehlt in .env");
 if (!ADMIN_CHAT_ID) throw new Error("TG_ADMIN_ID fehlt in .env");
 
 export const bot = new Bot(BOT_TOKEN);
-
-// /start => zeigt IDs (hilft beim Setup)
-bot.command("start", async (ctx) => {
-  await ctx.send(
-    `🤖 Bot läuft ✅\nChat-ID: ${ctx.chat.id}\nUser-ID: ${ctx.from?.id}`,
-  );
-});
+import "./index";
 
 type ReviewWord = { word: string; tips: string[] };
 
@@ -61,13 +54,11 @@ export async function sendWordSetForReview(params: {
       ],
     },
   });
-
-  // await bot.api.
 }
 
 bot.on("callback_query", async (ctx) => {
-  // ✅ FIX: in deiner GramIO version ist callback_data meistens hier:
   const body = (ctx as any).query?.data ?? (ctx as any).queryPayload;
+
   if (!body) {
     logger.warn("callback_query without data", {
       keys: Object.keys(ctx as any),
@@ -78,7 +69,7 @@ bot.on("callback_query", async (ctx) => {
   const raw = body.toString();
   if (!raw.includes(":")) {
     logger.warn("callback_data has no ':'", { raw });
-    // optional: user feedback
+
     try {
       await ctx.answerCallbackQuery({
         text: "⚠️ Ungültiger Button",
@@ -91,6 +82,7 @@ bot.on("callback_query", async (ctx) => {
   }
 
   const [command, setId] = raw.split(":");
+
   if (!command || !setId) {
     logger.warn("callback_data missing parts", { raw, command, setId });
     try {
@@ -104,7 +96,6 @@ bot.on("callback_query", async (ctx) => {
     return;
   }
 
-  // optional: ack click so Telegram UI doesn't "load"
   try {
     await ctx.answerCallbackQuery({
       text: "⏳ Wird verarbeitet...",
@@ -281,9 +272,6 @@ bot.on("callback_query", async (ctx) => {
   logger.info(raw);
 });
 
-bot.onStart(() => logger.info("Telegram Bot gestartet"));
-bot.start();
-
 export async function notifyTelegram(message: string) {
   try {
     await bot.api.sendMessage({
@@ -294,3 +282,11 @@ export async function notifyTelegram(message: string) {
     logger.error("Telegram notify failed", err);
   }
 }
+
+async function main() {
+  await bot.api.deleteWebhook();
+  bot.onStart(() => logger.info("Telegram Bot gestartet"));
+  await bot.start();
+}
+
+main();

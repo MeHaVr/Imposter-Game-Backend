@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
-    "seed": "ts-node --project tsconfig.json src/prisma/seed.ts"
+    "seed": "ts-node --project tsconfig.json src/prisma/seed.ts",
+    "build": "npx prisma generate && npx tsc",
+    "postinstall": "npx prisma generate"
   },
   "repository": {
     "type": "git",
