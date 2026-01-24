@@ -14,8 +14,8 @@ app.use(express.json());
 app.get("/health", (_req, res) => res.json({ ok: true }));
 app.get("/", (_req, res) => res.send("Imposter Game Backend is running!"));
 
-app.use("/api/word-sets", wordSetsRoute);
-app.use("/api/new-word-set", newWordSetsRoute);
+app.use("/word-sets", wordSetsRoute);
+app.use("/new-word-set", newWordSetsRoute);
 
 app.listen(PORT, () => {
   logger.info(`API running on http://localhost:${PORT}`);
